@@ -1,0 +1,4 @@
+--interp
+-main hxextern.Main
+-cp src/
+-lib hxargs

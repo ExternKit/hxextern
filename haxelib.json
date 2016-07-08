@@ -1,0 +1,15 @@
+{
+  "main": "hxextern.Main",
+  "name": "hxextern",
+  "url": "https://github.com/ExternKit/hxextern",
+  "license": "MIT",
+  "tags": ["extern", "hxextern"],
+  "description": "Extern manager",
+  "version": "0.1.0",
+  "classPath": "src/",
+  "contributors": ["fantoine"],
+  "dependencies": {
+    "hxargs": "",
+    "hxssl": ""
+  }
+}
