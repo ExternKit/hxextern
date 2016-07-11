@@ -2,7 +2,8 @@ package hxextern;
 
 import hxargs.Args;
 import hxextern.command.*;
-import hxextern.service.*;
+import hxextern.service.Console;
+import minject.Injector;
 
 typedef ArgsHandler = {
     function getDoc() : String;
@@ -12,33 +13,39 @@ typedef ArgsHandler = {
 
 class Cli
 {
+    @inject
+    public var injector(default, null) : Injector;
+
+    @inject
+    public var console(default, null) : Console;
+
     private var handler : ArgsHandler;
 
     public function new()
     {
         this.handler = Args.generate([
+            @doc('Generate extern code')
+            'generate' => function(?path : String) : Void {
+                this.runCommand(GenerateCommand, [path]);
+            },
+
             @doc('List available externs')
             'list' => function(?target : String) : Void {
-                this.runCommand(new ListCommand(target));
+                this.runCommand(ListCommand, [target]);
             },
 
             @doc('Search for an extern')
             'search' => function(name : String, ?target : String) : Void {
-                this.runCommand(new SearchCommand(name, target));
-            },
-
-            @doc('Generate extern code')
-            'generate' => function(?path : String) : Void {
-                trace('Not implemented');
+                this.runCommand(SearchCommand, [name, target]);
             },
 
             @doc('Show this help')
             'help' => function() : Void {
-                this.runCommand(new HelpCommand(this.handler.getDoc()));
+                this.runCommand(HelpCommand, [this.handler.getDoc()]);
             },
 
             _ => function(arg : String) : Void {
-                this.runCommand(new HelpCommand(this.handler.getDoc()));
+                this.runCommand(HelpCommand, [this.handler.getDoc()]);
             },
         ]);
     }
@@ -51,16 +58,17 @@ class Cli
         try {
             this.handler.parse(args);
         } catch (e : Dynamic) {
-            Console.instance.error(Std.string(e));
+            this.console.error(Std.string(e));
         }
     }
 
-    private function runCommand(command : ICommand) : Void
+    private function runCommand(commandType : Class<ICommand>, ?args : Array<Dynamic>) : Void
     {
         try {
-            command.run();
+            var command = this.injector.instantiate(commandType);
+            command.run(null == args ? [] : args);
         } catch (e : Dynamic) {
-            Console.instance.error(Std.string(e));
+            this.console.error(Std.string(e));
         }
     }
 }

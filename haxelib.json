@@ -9,7 +9,8 @@
   "classPath": "src/",
   "contributors": ["fantoine"],
   "dependencies": {
+    "hscript": "",
     "hxargs": "",
-    "hxssl": ""
+    "minject": ""
   }
 }

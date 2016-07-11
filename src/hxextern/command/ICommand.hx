@@ -2,5 +2,5 @@ package hxextern.command;
 
 interface ICommand
 {
-    public function run() : Void;
+    public function run(args : Array<Dynamic>) : Void;
 }

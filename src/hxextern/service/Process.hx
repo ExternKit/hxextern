@@ -12,24 +12,17 @@ typedef ProcessOutput = {
 
 class Process
 {
-    @:isVar
-    public static var instance(get, null) : Process;
-    private static function get_instance() : Process
-    {
-        if (null == Process.instance) {
-            Process.instance = new Process();
-        }
-        return Process.instance;
-    }
+    @inject
+    public var console(default, null) : Console;
 
-    private function new()
+    public function new()
     {
-        
+        // Nothing to do
     }
 
     public function execute(command : String, ?args : Array<String>) : ProcessOutput
     {
-        Console.instance.debug('Calling command "${command}' + (null != args && args.length > 0 ? ' ' + args.join(' ') : '') + '"');
+        this.console.debug('Calling command "${command}' + (null != args && args.length > 0 ? ' ' + args.join(' ') : '') + '"');
 
         var process = new HxProcess(command, args);
         var output = process.stdout.readAll().toString();

@@ -4,20 +4,16 @@ import hxextern.service.Repository;
 
 class ListCommand extends AbstractListCommand
 {
-    private var target : String;
-
-    public function new(?target : String)
+    public function new()
     {
         super();
-
-        this.target = target;
     }
 
-    public override function run() : Void
+    public override function run(args : Array<Dynamic>) : Void
     {
-        var target = (null == this.target ? null : Target.fromString(this.target));
+        var target : Null<Target> = (null == args[0] ? null : Target.fromString(args[0]));
 
-        var infos = Repository.instance.list(target);
+        var infos = this.repository.list(target);
         this.printList(infos);
     }
 }

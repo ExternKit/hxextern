@@ -5,12 +5,18 @@ import hxextern.service.Repository;
 
 class AbstractListCommand implements ICommand
 {
+    @inject
+    public var console(default, null) : Console;
+
+    @inject
+    public var repository(default, null) : Repository;
+
     public function new()
     {
         // Nothing to do
     }
 
-    public function run() : Void
+    public function run(args : Array<Dynamic>) : Void
     {
         throw 'Must be overriden';
     }
@@ -18,15 +24,17 @@ class AbstractListCommand implements ICommand
     private function printList(infos : Array<RepositoryInfo>) : Void
     {
         if (0 == infos.length) {
-            Console.instance.info('No results found');
+            this.console.info('No results found');
             return;
         }
 
-        Console.instance.success('Found ${infos.length} result(s)');
+        this.console.success('Found ${infos.length} result(s)');
         for (info in infos) {
-            Console.instance.message('  * ', false);
-            Console.instance.info('${info.name} (${info.target})', false);
-            Console.instance.message(' : ${info.description}');
+            this.console
+                .message('  * ', false)
+                .info('${info.name} (${info.target})', false)
+                .message(' : ${info.description}')
+            ;
         }
     }
 }

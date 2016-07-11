@@ -1,4 +1,6 @@
 --interp
 -main hxextern.Main
 -cp src/
+-lib hscript
 -lib hxargs
+-lib minject

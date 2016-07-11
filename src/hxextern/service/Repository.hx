@@ -17,15 +17,8 @@ class Repository
 
     private static var REPO_PATTERN : EReg = ~/extern-([a-z]+)-([a-z0-9_-]+)/ig;
 
-    @:isVar
-    public static var instance(get, null) : Repository;
-    private static function get_instance() : Repository
-    {
-        if (null == Repository.instance) {
-            Repository.instance = new Repository();
-        }
-        return Repository.instance;
-    }
+    @inject
+    public var process(default, null) : Process;
 
     private var repositories : Array<RepositoryInfo>;
 
@@ -43,7 +36,7 @@ class Repository
         this.repositories = [];
 
         // Get json from Github
-        var result = Process.instance.execute('curl', ['-sSf', Repository.REPOS_URL]);
+        var result = this.process.execute('curl', ['-sSf', Repository.REPOS_URL]);
         if (!result.valid) {
             throw result.error;
         }

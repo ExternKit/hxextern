@@ -4,22 +4,17 @@ import hxextern.service.Repository;
 
 class SearchCommand extends AbstractListCommand
 {
-    private var name : String;
-    private var target : String;
-
-    public function new(name : String, ?target : String)
+    public function new()
     {
         super();
-
-        this.name   = name;
-        this.target = target;
     }
 
-    public override function run() : Void
+    public override function run(args : Array<Dynamic>) : Void
     {
-        var target = (null == this.target ? null : Target.fromString(this.target));
+        var name : String         = args[0];
+        var target : Null<Target> = (null == args[1] ? null : Target.fromString(args[1]));
 
-        var infos = Repository.instance.find(this.name, target);
+        var infos = this.repository.find(name, target);
         this.printList(infos);
     }
 }

@@ -1,16 +1,25 @@
 package hxextern.command;
 
+import hxextern.service.Console;
+
 class HelpCommand implements ICommand
 {
-    private var doc : String;
+    @inject
+    public var console(default, null) : Console;
 
-    public function new(doc : String)
+    public function new()
     {
-        this.doc = doc;
+
     }
 
-    public function run() : Void
+    public function run(args : Array<Dynamic>) : Void
     {
-        Sys.println(this.doc);
+        var doc : String = args[0];
+
+        this.console
+            .info('HxExtern Manager 1.0.0')
+            .message('  Usage: hxextern [command] <arguments>')
+            .message('    ' + doc.split('\n').join('\n    '))
+        ;
     }
 }
