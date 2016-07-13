@@ -1,8 +1,11 @@
 package hxextern.command;
 
+import haxe.io.Path;
+import hxextern.service.Console;
 import hxextern.service.Haxelib;
-import hxextern.step.*;
 import hxextern.step.IStep;
+import hxextern.step.StepContext;
+import minject.Injector;
 import sys.FileSystem;
 
 using StringTools;
@@ -10,20 +13,20 @@ using StringTools;
 class GenerateCommand implements ICommand
 {
     @inject
+    public var injector(default, null) : Injector;
+
+    @inject
     public var haxelib(default, null) : Haxelib;
+    
+    @inject
+    public var console(default, null) : Console;
+
+    @inject('cwd')
+    public var cwd(default, null) : String;
 
     public function new()
     {
-        /*
-        this.path  = path;
-        this.steps = new Map();
-
-        var types : Array<Class<IStep>> = [ScriptStep, NpmStep];
-        for (type in types) {
-            var instance = Type.createInstance(type, []);
-            this.steps[instance.type] = instance;
-        }
-        */
+        
     }
 
     public function run(args : Array<Dynamic>) : Void
@@ -33,30 +36,48 @@ class GenerateCommand implements ICommand
         // Find haxelib file
         var file = (null != path ?
             this.haxelib.findFile(path) :
-            this.haxelib.findFromPath(Sys.getCwd())
+            this.haxelib.findFromPath(this.cwd)
         );
 
         // Extract datas
         var data = this.haxelib.extract(file);
-        this.executeSteps(data.steps);
+        var context = new StepContext();
+
+        // Update to haxelib.json file
+        Sys.setCwd(Path.directory(file));
+
+        // Run steps
+        this.executeSteps(context, data.steps);
+        this.generateCode(context);
     }
 
-    private function executeSteps(steps : Array<HaxelibHxExternStep>) : Void
+    private function executeSteps(context : StepContext, steps : Array<HaxelibHxExternStep>) : Void
     {
-        /*
-        var definitions = new TypeDefinitionMap();
-        for (step in steps) {
+        // Run steps
+        for (i in 0...steps.length) {
+            var step = steps[i];
+
             // Get step name
             var name = step.type.trim().toLowerCase();
-            if (!this.steps.exists(name)) {
-                throw 'Step "${step.type}" has not been found';
+
+            // Get step
+            var instance = try this.injector.getInstance(IStep, name) catch(e : Dynamic) null;
+            if (null == instance) {
+                throw 'Step ${step.type} has not been found';
             }
 
+            // Prepare context
+            context.setup(name);
+
             // Run step
-            var instance = this.steps[name];
-            definitions = instance.run(definitions, step.options);
+            this.console.info('(${i + 1}) Running step "${name}"');
+            instance.initialize(step.options);
+            instance.run(context);
         }
-        trace(definitions);
-        */
+    }
+
+    private function generateCode(context : StepContext) : Void
+    {
+
     }
 }

@@ -42,4 +42,13 @@ class Process
 
         return result;
     }
+
+    public function checkCommand(command : String) : Void
+    {
+        // Check if command exists
+        var result = this.execute('which', [command]);
+        if (0 != result.code) {
+            throw 'Command "${command}" not available';
+        }
+    }
 }

@@ -14,14 +14,13 @@ class Main
         // Prepare injector
         var injector = new Injector();
         injector.mapValue(Injector, injector);
+        injector.mapValue(String, cwd, 'cwd'); // current working directory
+        injector.mapValue(String, Sys.getCwd(), 'hwd'); // hxextern working directory
         injector.mapSingleton(Console);
         injector.mapSingleton(Haxelib);
         injector.mapSingleton(Process);
         injector.mapSingleton(Repository);
         Macro.listSteps(injector);
-
-        // Update cwd
-        Sys.setCwd(cwd);
 
         // Run
         var cli = injector.instantiate(Cli);

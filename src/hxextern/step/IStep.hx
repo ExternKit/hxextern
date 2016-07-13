@@ -1,12 +1,10 @@
 package hxextern.step;
 
-import haxe.macro.Expr;
-
-typedef TypeDefinitionMap = Map<String, TypeDefinition>;
+import haxe.DynamicAccess;
 
 interface IStep
 {
-    public var type(default, null) : String;
+    public function initialize(options : DynamicAccess<Dynamic>) : Void;
 
-    public function run(definitions : TypeDefinitionMap, options : Null<Dynamic>) : TypeDefinitionMap;
+    public function run(context : StepContext) : Void;
 }

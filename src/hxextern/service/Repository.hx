@@ -4,6 +4,8 @@ import haxe.Json;
 import hxextern.service.Process;
 import hxextern.Target;
 
+using hxextern.Tools;
+
 typedef RepositoryInfo = {
     var name : String;
     var target : Target;
@@ -89,9 +91,7 @@ class Repository
     {
         this.preload();
 
-        var escapedName = ~/([-[\]{}()*+?.,\\^$|#\s])/g.replace(name, '\\$1');
-        var ereg        = new EReg(escapedName, 'ig');
-        
+        var ereg = new EReg(name.escapeEReg(), 'ig');
         return [
             for (info in this.repositories)
                 if (ereg.match(info.name) && (null == target || info.target == target))

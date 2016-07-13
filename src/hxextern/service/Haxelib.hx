@@ -67,8 +67,21 @@ class Haxelib
         // Return validated object
         return {
             steps: [ for (step in (steps : Array<DynamicAccess<Dynamic>>)) {
-                type: this.extractField(step, 'type'),
-                options: (step.exists('options') ? step['options'] : null),
+                var type = this.extractField(step, 'type');
+                var options = null;
+                for (field in step.keys()) {
+                    if ('type' == field) {
+                        continue;
+                    }
+                    if (null == options) {
+                        options = {};
+                    }
+                    Reflect.setField(options, field, step[field]);
+                }
+                {
+                    type: type,
+                    options: options,
+                };
             } ],
         };
     }
