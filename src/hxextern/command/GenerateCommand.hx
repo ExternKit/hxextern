@@ -1,12 +1,14 @@
 package hxextern.command;
 
 import haxe.io.Path;
+import haxe.macro.Printer;
 import hxextern.service.Console;
 import hxextern.service.Haxelib;
 import hxextern.step.IStep;
 import hxextern.step.StepContext;
 import minject.Injector;
 import sys.FileSystem;
+import sys.io.File;
 
 using StringTools;
 
@@ -48,7 +50,7 @@ class GenerateCommand implements ICommand
 
         // Run steps
         this.executeSteps(context, data.steps);
-        this.generateCode(context);
+        this.generateCode(context, data.output);
     }
 
     private function executeSteps(context : StepContext, steps : Array<HaxelibHxExternStep>) : Void
@@ -76,8 +78,36 @@ class GenerateCommand implements ICommand
         }
     }
 
-    private function generateCode(context : StepContext) : Void
+    private function generateCode(context : StepContext, output : String) : Void
     {
+        this.console.info('Generating code');
+        var basePath = Path.addTrailingSlash(FileSystem.absolutePath(output));
+        var printer = new Printer();
 
+        // Generate all files
+        var done = false;
+        for (definition in context.definitions) {
+            done = true;
+
+            // Ensure directory exists
+            var directory = basePath + definition.pack.join('/');
+            FileSystem.createDirectory(directory);
+
+            var filename = '${directory}/${definition.name}.hx';
+            var type = (definition.pack.length > 0 ? definition.pack.join('.') + '.' : '') + definition.name;
+
+            // Preparing content
+            this.console.debug('Preparing code for type "${type}"');
+            var content = printer.printTypeDefinition(definition, true);
+
+            // Writing file content
+            this.console.debug('Writing content to "${filename}"');
+            File.saveContent(filename, '${content}\n');
+
+            this.console.success('Type "${type}" generated');
+        }
+        if (!done) {
+            this.console.success('No types generated');
+        }
     }
 }

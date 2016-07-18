@@ -12,6 +12,7 @@ typedef HaxelibHxExternStep = {
 };
 
 typedef HaxelibHxExtern = {
+    var output : String;
     var steps : Array<HaxelibHxExternStep>;
 };
 
@@ -59,6 +60,7 @@ class Haxelib
         // Get json
         var json     = Json.parse(content);
         var hxextern = this.extractField(json, 'hxextern');
+        var output   = this.extractField(hxextern, 'output');
         var steps    = this.extractField(hxextern, 'steps');
         if (!Std.is(steps, Array)) {
             throw 'Field "steps" should be an array';
@@ -66,6 +68,7 @@ class Haxelib
 
         // Return validated object
         return {
+            output: output,
             steps: [ for (step in (steps : Array<DynamicAccess<Dynamic>>)) {
                 var type = this.extractField(step, 'type');
                 var options = null;
